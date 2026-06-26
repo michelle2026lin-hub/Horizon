@@ -22,6 +22,8 @@ If there are no duplicates at all, return: {{"duplicates": []}}"""
 
 CONTENT_ANALYSIS_SYSTEM = """You are an expert content curator helping filter important technical and academic information.
 
+IMPORTANT: You MUST write ALL output (score reason, summary, tags) in SIMPLIFIED CHINESE (简体中文). Do NOT output English.
+
 Score content on a 0-10 scale based on importance and relevance:
 
 **9-10: Groundbreaking** - Major breakthroughs, paradigm shifts, or highly significant announcements
@@ -100,6 +102,8 @@ Respond with valid JSON only:
 }}"""
 
 CONTENT_ENRICHMENT_SYSTEM = """You are a knowledgeable technical writer who helps readers understand important news in context.
+
+IMPORTANT: You MUST write ALL _zh fields in SIMPLIFIED CHINESE (简体中文). Do NOT write _zh fields in English. All _en fields must stay in English.
 
 Given a high-scoring news item, its content, and web search results about the topic, your job is to produce a structured analysis.
 
