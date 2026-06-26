@@ -6,14 +6,25 @@
   },
   "sources": {
     "rss": [
-      {"name": "Hacker News", "url": "https://news.ycombinator.com/rss"},
-      {"name": "Simon Willison", "url": "https://simonwillison.net/atom/everything/"}
+      {"name": "Hacker News", "url": "https://news.ycombinator.com/rss", "enabled": true},
+      {"name": "Simon Willison", "url": "https://simonwillison.net/atom/everything/", "enabled": true}
     ],
-    "reddit": [
-      {"subreddit": "LocalLLaMA"},
-      {"subreddit": "selfhosted"},
-      {"subreddit": "automation"}
-    ]
+    "reddit": {
+      "enabled": true,
+      "subreddits": [
+        {"subreddit": "LocalLLaMA", "enabled": true, "sort": "hot", "fetch_limit": 15, "min_score": 50},
+        {"subreddit": "selfhosted", "enabled": true, "sort": "hot", "fetch_limit": 15, "min_score": 50},
+        {"subreddit": "automation", "enabled": true, "sort": "hot", "fetch_limit": 15, "min_score": 50}
+      ]
+    }
+  },
+  "filtering": {
+    "ai_score_threshold": 6.0,
+    "time_window_hours": 24,
+    "max_items": null,
+    "category_groups": {},
+    "default_group": "other",
+    "default_group_limit": null
   },
   "outputs": {
     "feishu": {
