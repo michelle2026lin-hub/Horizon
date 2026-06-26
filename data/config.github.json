@@ -1,13 +1,13 @@
 {
   "ai": {
     "provider": "openai",
-    "model": "llama-3.3-70b-versatile",
+    "model": "llama-3.1-8b-instant",
     "api_key_env": "GROQ_API_KEY",
     "base_url": "https://api.groq.com/openai/v1",
-    "throttle_sec": 4,
+    "throttle_sec": 6,
     "analysis_concurrency": 1,
     "enrichment_concurrency": 1
-  },
+},,
   "sources": {
     "hackernews": {
       "enabled": true,
@@ -52,13 +52,13 @@
     "ai_score_threshold": 6.0,
     "time_window_hours": 24
   },
-  "webhook": {
+ "webhook": {
     "enabled": true,
     "url_env": "FEISHU_WEBHOOK",
     "delivery": "summary",
     "platform": "feishu",
-    "layout": "markdown",
+    "layout": "text",
     "languages": ["en", "zh"]
-  },
+},
   "language": "zh"
 }
