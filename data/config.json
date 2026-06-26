@@ -1,9 +1,12 @@
 {
   "ai": {
-    "provider": "gemini",
-    "model": "gemini-1.5-flash",
-    "api_key_env": "GOOGLE_API_KEY"
-  },
+  "provider": "groq",
+  "model": "llama-3.3-70b-versatile",
+  "api_key_env": "GROQ_API_KEY",
+  "throttle_sec": 2,
+  "analysis_concurrency": 1,
+  "enrichment_concurrency": 1
+},
   "sources": {
     "rss": [
       {"name": "Hacker News", "url": "https://news.ycombinator.com/rss", "enabled": true},
