@@ -1,0 +1,18 @@
+{
+  "ai": {
+    "provider": "gemini",
+    "model": "gemini-1.5-flash",
+    "api_key_env": "GOOGLE_API_KEY"
+  },
+  "sources": {
+    "rss": [
+      {"name": "Hacker News", "url": "https://news.ycombinator.com/rss"},
+      {"name": "Simon Willison", "url": "https://simonwillison.net/atom/everything/"}
+    ],
+    "reddit": [
+      {"subreddit": "LocalLLaMA"},
+      {"subreddit": "selfhosted"},
+      {"subreddit": "automation"}
+    ]
+  }
+}
