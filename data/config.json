@@ -1,33 +1,64 @@
 {
   "ai": {
-  "provider": "ollama",
-  "model": "llama-3.3-70b-versatile",
-  "api_key_env": "GROQ_API_KEY",
-  "base_url": "https://api.groq.com/openai/v1",
-  "throttle_sec": 2,
-  "analysis_concurrency": 1,
-  "enrichment_concurrency": 1
-},
+    "provider": "openai",
+    "model": "llama-3.3-70b-versatile",
+    "api_key_env": "GROQ_API_KEY",
+    "base_url": "https://api.groq.com/openai/v1",
+    "throttle_sec": 2,
+    "analysis_concurrency": 1,
+    "enrichment_concurrency": 1
+  },
   "sources": {
+    "hackernews": {
+      "enabled": true,
+      "fetch_top_stories": 20,
+      "min_score": 100
+    },
     "rss": [
-      {"name": "Hacker News", "url": "https://news.ycombinator.com/rss", "enabled": true},
-      {"name": "Simon Willison", "url": "https://simonwillison.net/atom/everything/", "enabled": true}
+      {
+        "name": "Simon Willison",
+        "url": "https://simonwillison.net/atom/everything/",
+        "enabled": true
+      }
     ],
     "reddit": {
       "enabled": true,
       "subreddits": [
-        {"subreddit": "LocalLLaMA", "enabled": true, "sort": "hot", "fetch_limit": 15, "min_score": 50},
-        {"subreddit": "selfhosted", "enabled": true, "sort": "hot", "fetch_limit": 15, "min_score": 50},
-        {"subreddit": "automation", "enabled": true, "sort": "hot", "fetch_limit": 15, "min_score": 50}
+        {
+          "subreddit": "LocalLLaMA",
+          "enabled": true,
+          "sort": "hot",
+          "fetch_limit": 15,
+          "min_score": 50
+        },
+        {
+          "subreddit": "selfhosted",
+          "enabled": true,
+          "sort": "hot",
+          "fetch_limit": 15,
+          "min_score": 50
+        },
+        {
+          "subreddit": "automation",
+          "enabled": true,
+          "sort": "hot",
+          "fetch_limit": 15,
+          "min_score": 50
+        }
       ]
     }
   },
   "filtering": {
     "ai_score_threshold": 6.0,
-    "time_window_hours": 24,
-    "max_items": null,
-    "category_groups": {},
-    "default_group": "other",
-    "default_group_limit": null
-  }
+    "time_window_hours": 24
+  },
+  "webhook": {
+    "enabled": true,
+    "url_env": "FEISHU_WEBHOOK",
+    "delivery": "summary",
+    "platform": "feishu",
+    "layout": "markdown",
+    "languages": ["zh"]
+  },
+  "language": "zh"
 }
