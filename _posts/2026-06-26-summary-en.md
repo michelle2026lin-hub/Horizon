@@ -5,21 +5,14 @@ date: 2026-06-26
 lang: en
 ---
 
-> From 24 items, 1 important content pieces were selected
+> Analyzed 25 items, but none met the importance threshold.
 
----
+No significant developments today. This might indicate:
+- A quiet day in your tracked sources
+- The AI score threshold is too high
+- Your information sources need expansion
 
-1. [Why have papers by one of history's most famous physicists been retracted?](#item-1) ⭐️ 8.0/10
-
----
-
-<a id="item-1"></a>
-## [Why have papers by one of history's most famous physicists been retracted?](https://www.science.org/content/article/why-have-papers-one-history-s-most-famous-physicists-been-retracted) ⭐️ 8.0/10
-
-Papers by a famous physicist have been retracted, sparking discussion on academic publishing issues, including self-plagiarism and predatory pricing
-
-hackernews · adharmad · Jun 26, 14:10 · [Discussion](https://news.ycombinator.com/item?id=48686834)
-
-**Tags**: `#Academic Publishing`, `#Physics`, `#Research Integrity`, `#Scientific Retraction`
-
----
+Consider:
+1. Lowering the `ai_score_threshold` in config.json
+2. Adding more diverse information sources
+3. Checking if the AI model is working correctly
