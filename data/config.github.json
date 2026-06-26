@@ -7,7 +7,7 @@
     "throttle_sec": 6,
     "analysis_concurrency": 1,
     "enrichment_concurrency": 1
-},,
+  },
   "sources": {
     "hackernews": {
       "enabled": true,
@@ -52,13 +52,44 @@
     "ai_score_threshold": 6.0,
     "time_window_hours": 24
   },
- "webhook": {
+  "webhook": {
     "enabled": true,
     "url_env": "FEISHU_WEBHOOK",
     "delivery": "summary",
     "platform": "feishu",
-    "layout": "text",
-    "languages": ["en", "zh"]
-},
+    "layout": "markdown",
+    "languages": ["en", "zh"],
+    "request_body": {
+      "msg_type": "interactive",
+      "card": {
+        "schema": "2.0",
+        "config": {
+          "wide_screen_mode": true
+        },
+        "header": {
+          "title": {
+            "tag": "plain_text",
+            "content": "#{message_title}"
+          },
+          "template": "blue"
+        },
+        "body": {
+          "elements": [
+            {
+              "tag": "markdown",
+              "content": "Horizon日报重要资讯数量: #{important_items}/#{all_items}"
+            },
+            {
+              "tag": "hr"
+            },
+            {
+              "tag": "markdown",
+              "content": "#{summary}"
+            }
+          ]
+        }
+      }
+    }
+  },
   "language": "zh"
 }
