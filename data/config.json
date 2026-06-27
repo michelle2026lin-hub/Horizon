@@ -58,7 +58,7 @@
     "delivery": "summary",
     "platform": "feishu",
     "layout": "markdown",
-    "languages": ["en", "zh"],
+    "languages": ["zh"],
     "request_body": {
       "msg_type": "interactive",
       "card": {
