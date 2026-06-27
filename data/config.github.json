@@ -5,7 +5,7 @@
     "api_key_env": "DASHSCOPE_API_KEY",
     "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
     "throttle_sec": 2,
-    "analysis_concurrency": 2,
+    "analysis_concurrency": 1,
     "enrichment_concurrency": 1
   },
   "sources": {
@@ -24,27 +24,9 @@
     "reddit": {
       "enabled": true,
       "subreddits": [
-        {
-          "subreddit": "LocalLLaMA",
-          "enabled": true,
-          "sort": "hot",
-          "fetch_limit": 15,
-          "min_score": 50
-        },
-        {
-          "subreddit": "selfhosted",
-          "enabled": true,
-          "sort": "hot",
-          "fetch_limit": 15,
-          "min_score": 50
-        },
-        {
-          "subreddit": "automation",
-          "enabled": true,
-          "sort": "hot",
-          "fetch_limit": 15,
-          "min_score": 50
-        }
+        {"subreddit": "LocalLLaMA", "enabled": true, "sort": "hot", "fetch_limit": 15, "min_score": 50},
+        {"subreddit": "selfhosted", "enabled": true, "sort": "hot", "fetch_limit": 15, "min_score": 50},
+        {"subreddit": "automation", "enabled": true, "sort": "hot", "fetch_limit": 15, "min_score": 50}
       ]
     }
   },
@@ -58,38 +40,7 @@
     "delivery": "summary",
     "platform": "feishu",
     "layout": "markdown",
-    "languages": ["zh"],
-    "request_body": {
-      "msg_type": "interactive",
-      "card": {
-        "schema": "2.0",
-        "config": {
-          "wide_screen_mode": true
-        },
-        "header": {
-          "title": {
-            "tag": "plain_text",
-            "content": "#{message_title}"
-          },
-          "template": "blue"
-        },
-        "body": {
-          "elements": [
-            {
-              "tag": "markdown",
-              "content": "Horizon日报重要资讯数量: #{important_items}/#{all_items}"
-            },
-            {
-              "tag": "hr"
-            },
-            {
-              "tag": "markdown",
-              "content": "#{summary}"
-            }
-          ]
-        }
-      }
-    }
+    "languages": ["zh"]
   },
   "language": "zh"
 }
