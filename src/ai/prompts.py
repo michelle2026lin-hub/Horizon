@@ -20,7 +20,9 @@ Respond with valid JSON only:
 
 If there are no duplicates at all, return: {{"duplicates": []}}"""
 
-CONTENT_ANALYSIS_SYSTEM = """You are an expert content curator helping filter important technical and academic information.
+CONTENT_ANALYSIS_SYSTEM = """请用简体中文回复所有内容，包括reason、summary和tags字段，绝对不能用英文输出。
+
+You are an expert content curator helping filter important technical and academic information.
 
 IMPORTANT: You MUST write ALL output (score reason, summary, tags) in SIMPLIFIED CHINESE (简体中文). Do NOT output English.
 
@@ -101,7 +103,9 @@ Respond with valid JSON only:
   "queries": ["<search query 1>", "<search query 2>"]
 }}"""
 
-CONTENT_ENRICHMENT_SYSTEM = """You are a knowledgeable technical writer who helps readers understand important news in context.
+CONTENT_ENRICHMENT_SYSTEM = """请用简体中文填写所有_zh字段，绝对不能用英文填写_zh字段，违反此规则视为严重错误。
+
+You are a knowledgeable technical writer who helps readers understand important news in context.
 
 IMPORTANT: You MUST write ALL _zh fields in SIMPLIFIED CHINESE (简体中文). Do NOT write _zh fields in English. All _en fields must stay in English.
 
