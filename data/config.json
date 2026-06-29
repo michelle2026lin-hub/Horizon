@@ -12,8 +12,8 @@
   "sources": {
     "hackernews": {
       "enabled": true,
-      "fetch_top_stories": 5,
-      "min_score": 50
+      "fetch_top_stories": 20,
+      "min_score": 100
     },
     "rss": [
       {
@@ -23,7 +23,7 @@
       }
     ],
     "reddit": {
-      "enabled": false,
+      "enabled": true,
       "subreddits": [
         {"subreddit": "LocalLLaMA", "enabled": true, "sort": "hot", "fetch_limit": 15, "min_score": 50},
         {"subreddit": "selfhosted", "enabled": true, "sort": "hot", "fetch_limit": 15, "min_score": 50},
@@ -32,7 +32,7 @@
     }
   },
   "filtering": {
-    "ai_score_threshold": 5.0,
+    "ai_score_threshold": 6.0,
     "time_window_hours": 24
   },
   "webhook": {
