@@ -15,19 +15,39 @@
       "fetch_top_stories": 5,
       "min_score": 50
     },
+    "github": [
+      {
+        "type": "trending",
+        "language": "python",
+        "enabled": true
+      },
+      {
+        "type": "trending",
+        "language": "typescript",
+        "enabled": true
+      }
+    ],
     "rss": [
       {
         "name": "Simon Willison",
         "url": "https://simonwillison.net/atom/everything/",
         "enabled": true
+      },
+      {
+        "name": "ProductHunt",
+        "url": "https://www.producthunt.com/feed",
+        "enabled": true
       }
     ],
     "reddit": {
-      "enabled": false,
+      "enabled": true,
       "subreddits": [
-        {"subreddit": "LocalLLaMA", "enabled": true, "sort": "hot", "fetch_limit": 15, "min_score": 50},
-        {"subreddit": "selfhosted", "enabled": true, "sort": "hot", "fetch_limit": 15, "min_score": 50},
-        {"subreddit": "automation", "enabled": true, "sort": "hot", "fetch_limit": 15, "min_score": 50}
+        {"subreddit": "LocalLLaMA", "enabled": true, "sort": "hot", "fetch_limit": 10, "min_score": 50},
+        {"subreddit": "automation", "enabled": true, "sort": "hot", "fetch_limit": 10, "min_score": 30},
+        {"subreddit": "selfhosted", "enabled": true, "sort": "hot", "fetch_limit": 10, "min_score": 30},
+        {"subreddit": "MachineLearning", "enabled": true, "sort": "hot", "fetch_limit": 10, "min_score": 50},
+        {"subreddit": "opensource", "enabled": true, "sort": "hot", "fetch_limit": 10, "min_score": 30},
+        {"subreddit": "artificial", "enabled": true, "sort": "hot", "fetch_limit": 10, "min_score": 30}
       ]
     }
   },
@@ -35,36 +55,15 @@
     "ai_score_threshold": 6.0,
     "time_window_hours": 6
   },
+  "enrichment": {
+    "enabled": false
+  },
   "webhook": {
     "enabled": true,
     "url_env": "FEISHU_WEBHOOK",
     "delivery": "summary",
     "platform": "feishu",
     "layout": "markdown",
-    "languages": ["zh"],
-    "request_body": {
-      "msg_type": "interactive",
-      "card": {
-        "schema": "2.0",
-        "config": {
-          "wide_screen_mode": true
-        },
-        "header": {
-          "title": {
-            "tag": "plain_text",
-            "content": "#{message_title}"
-          },
-          "template": "blue"
-        },
-        "body": {
-          "elements": [
-            {
-              "tag": "markdown",
-              "content": "#{summary}"
-            }
-          ]
-        }
-      }
-    }
+    "languages": ["zh"]
   }
 }
