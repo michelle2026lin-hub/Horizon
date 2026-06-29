@@ -1,7 +1,7 @@
 {
   "ai": {
     "provider": "openai",
-    "model": "qwen3.7-plus",
+    "model": "qwen-turbo-latest",
     "api_key_env": "DASHSCOPE_API_KEY",
     "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
     "throttle_sec": 2,
