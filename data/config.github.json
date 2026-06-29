@@ -36,16 +36,11 @@
     "time_window_hours": 24
   },
   "webhook": {
-  "enabled": true,
-  "url_env": "FEISHU_WEBHOOK",
-  "delivery": "summary",
-  "platform": "feishu",
-  "layout": "markdown",
-  "languages": ["zh"],
-  "request_body": {
-    "msg_type": "text",
-    "content": {
-      "text": "#{summary}"
-    }
+    "enabled": true,
+    "url_env": "FEISHU_WEBHOOK",
+    "delivery": "summary",
+    "platform": "feishu",
+    "layout": "markdown",
+    "languages": ["zh"]
   }
 }
