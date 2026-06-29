@@ -7,6 +7,7 @@
     "throttle_sec": 2,
     "analysis_concurrency": 1,
     "enrichment_concurrency": 1
+    "languages": ["zh"]
   },
   "sources": {
     "hackernews": {
@@ -34,7 +35,6 @@
     "ai_score_threshold": 5.0,
     "time_window_hours": 24
   },
-  "output_languages": ["zh"],
   "webhook": {
     "enabled": true,
     "url_env": "FEISHU_WEBHOOK",
@@ -43,5 +43,5 @@
     "layout": "markdown",
     "languages": ["zh"]
   },
-  "language": "zh"
+
 }
