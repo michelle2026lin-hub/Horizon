@@ -40,7 +40,30 @@
     "url_env": "FEISHU_WEBHOOK",
     "delivery": "summary",
     "platform": "feishu",
-    "layout": "collapsible",
-    "languages": ["zh"]
+    "layout": "markdown",
+    "languages": ["zh"],
+    "request_body": {
+      "msg_type": "interactive",
+      "card": {
+        "schema": "2.0",
+        "config": {
+          "wide_screen_mode": true
+        },
+        "header": {
+          "title": {
+            "tag": "plain_text",
+            "content": "#{message_title}"
+          },
+          "template": "blue"
+        },
+        "body": {
+          "elements": [
+            {
+              "tag": "markdown",
+              "content": "#{summary}"
+            }
+          ]
+        }
+      }
+    }
   }
-}
