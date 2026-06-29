@@ -40,7 +40,7 @@
     "url_env": "FEISHU_WEBHOOK",
     "delivery": "summary",
     "platform": "feishu",
-    "layout": "markdown",
+    "layout": "collapsible",
     "languages": ["zh"]
   }
 }
