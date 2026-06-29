@@ -1,6 +1,8 @@
-name: Daily Horizon Summary (Debug - Fast Test)
+name: Daily Horizon Summary
 
 on:
+  schedule:
+    - cron: '0 0 * * *'
   workflow_dispatch:      # ✅ 只允许手动触发，防止误跑 1 小时
 
 jobs:
