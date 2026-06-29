@@ -14,7 +14,7 @@ import httpx
 # ── 配置 ──────────────────────────────────────────────────────────────────────
 DASHSCOPE_API_KEY = os.environ.get("DASHSCOPE_API_KEY", "")
 FEISHU_WEBHOOK    = os.environ.get("FEISHU_WEBHOOK", "")
-MODEL             = "qwen-plus"
+MODEL             = "qwen3.7-plus-2026-05-26"
 BASE_URL          = "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions"
 SUMMARY_DIR       = "data/summaries"
 SCRIPT_MAP_PATH   = "data/Melody_Script_Map.md"
