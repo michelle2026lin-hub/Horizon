@@ -9,44 +9,42 @@ lang: zh
 
 ---
 
-1. [1.6 万亿参数 MoE 模型 LongCat-2.0 揭秘](#item-1) ⭐️ 8.0/10
-2. [知名开发者发布网页表格提取工具](#item-2) ⭐️ 7.0/10
+1. [多评论家框架提升本地模型代码质量](#item-1) ⭐️ 7.0/10
+2. [Simon Willison 发布 HTML 表格提取工具](#item-2) ⭐️ 6.0/10
 
 ---
 
 <a id="item-1"></a>
-## [1.6 万亿参数 MoE 模型 LongCat-2.0 揭秘](https://www.reddit.com/r/LocalLLaMA/comments/1uj7egu/introducing_longcat20_a_largescale_moe_language/) ⭐️ 8.0/10
+## [多评论家框架提升本地模型代码质量](https://www.reddit.com/r/LocalLLaMA/comments/1uj9viw/been_running_qwen3627b_through_a_3critic_harness/) ⭐️ 7.0/10
 
-社区揭秘并介绍了此前使用隐藏代号的 1.6 万亿参数大规模混合专家语言模型。
+作者分享了使用多评论家框架运行本地大语言模型进行编码任务的实战经验，并提出了利用强模型规划结合本地模型执行的高效混合架构模式。
 
-reddit · r/LocalLLaMA · /u/AnticitizenPrime · 6月29日 22:42
+reddit · r/LocalLLaMA · /u/workout_JK · 6月30日 00:25
 
-**背景**: 混合专家（MoE）是一种架构，它针对每个输入 token 仅激活模型参数的一个子集，从而允许极大的总参数量而不会按比例增加计算成本。OpenRouter 是一个统一的 API 平台，为开发者提供对来自多个提供商的各种大语言模型的无缝访问。
+**背景**: 像 Qwen3.6-27B 这样的本地大语言模型是可以在消费级硬件上运行的开源权重模型，具有隐私和成本优势，但在复杂推理方面通常落后于专有的前沿模型。多评论家框架涉及使用额外的模型实例来评估和验证主生成模型的输出，从而显著提高可靠性。Playwright 是一个用于自动化网页浏览器交互的端到端测试框架，在此场景中作为生成代码的自动化验证器。
 
 <details><summary>参考链接</summary>
 <ul>
-<li><a href="https://cryptobriefing.com/openrouter-owl-alpha-model-global-ranking/">OpenRouter's Owl Alpha model hits 10.1T monthly tokens, ranks first globally</a></li>
-<li><a href="https://x.com/rohanpaul_ai/status/2071123605694652737">I'm hearing that "Owl Alpha", one of OpenRouter's fastest ...</a></li>
-<li><a href="https://linux.do/t/topic/2091743?tl=en">Owl alpha很可能是美团的Longcat2.0 - 前沿快讯 - LINUX DO</a></li>
+<li><a href="https://arxiv.org/abs/2503.09758">[2503.09758] Multi-Agent LLM Actor-Critic Framework for Social Robot Navigation</a></li>
+<li><a href="https://playwright.dev/docs/test-agents">Agents | Playwright</a></li>
+<li><a href="https://arxiv.org/html/2512.20957v2">One Tool Is Enough: Reinforcement Learning for Repository - Level ...</a></li>
 
 </ul>
 </details>
 
-**社区讨论**: 社区对该模型的庞大规模和出色性能感到非常兴奋，特别是它在不依赖 NVIDIA 芯片的情况下处理 100 万上下文窗口和智能体任务的能力。用户们正在积极讨论其潜在来源，许多人确认这是美团的作品，并称赞其在 OpenRouter 上的高吞吐量。
-
-**标签**: `#大语言模型`, `#混合专家模型`, `#人工智能`, `#模型发布`, `#本地部署`
+**标签**: `#本地大语言模型`, `#智能体框架`, `#代码生成`, `#模型协同`
 
 ---
 
 <a id="item-2"></a>
-## [知名开发者发布网页表格提取工具](https://simonwillison.net/2026/Jun/29/html-table-extractor/#atom-everything) ⭐️ 7.0/10
+## [Simon Willison 发布 HTML 表格提取工具](https://simonwillison.net/2026/Jun/29/html-table-extractor/#atom-everything) ⭐️ 6.0/10
 
-知名开发者发布了一款网页表格提取工具，可将浏览器粘贴的富文本表格快速转换为多种结构化数据格式。
+一款实用的网页工具发布，可将浏览器中复制的富文本表格快速转换为网页代码、标记文本、逗号分隔值或结构化数据等多种格式。
 
 rss · Simon Willison · 6月29日 23:38
 
-**背景**: 从网页中提取表格数据是数据分析和网页抓取中的常见任务，但从浏览器复制富文本通常会导致格式混乱。这类工具弥合了非结构化网页内容与结构化数据格式之间的鸿沟，免除了日常任务中编写复杂解析逻辑的需要。
+**背景**: 当用户从网页复制表格时，剪贴板通常会将其存储为包含嵌入 HTML 的富文本，这使得将其干净地粘贴到电子表格或代码编辑器中变得困难。CORS（跨源资源共享）是一种允许网页向提供该网页的域以外的域发出请求的机制，维基百科利用此机制允许客户端工具直接访问其 API。
 
-**标签**: `#实用工具`, `#数据提取`, `#网页表格`, `#格式转换`, `#开发者工具`
+**标签**: `#开发者工具`, `#数据提取`, `#网页表格`, `#效率工具`, `#数据转换`
 
 ---
