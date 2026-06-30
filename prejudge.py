@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-prejudge.py — Melody 自动化系统「预审官」
-读取 Horizon 生成的中文日报，调用 Qwen API 按预审官逻辑分析，结果推送飞书。
-v2：加入 Video_Tool_DB.csv 查重逻辑。
+prejudge.py — Melody 自动化系统「预审官」 v3
+读取 Horizon 生成的中文日报，调用 Qwen API 按【完整】Melody_Script_Map.md 逐条核对，
+结果推送飞书。不再使用精简/截取版，全文件注入 System Prompt。
 """
 
 import os
@@ -21,37 +21,30 @@ SUMMARY_DIR       = "data/summaries"
 SCRIPT_MAP_PATH   = "data/Melody_Script_Map.md"
 TOOL_DB_PATH      = "data/Video_Tool_DB.csv"
 
-# ── Script Map 内嵌精简版（备用）────────────────────────────────────────────────
-SCRIPT_MAP_INLINE = """
-## 关键映射规则（预审官必读）
-
-### 高优先级子步骤（可被替代/升级）
-- 1.12 VL调用：图像识别/标签提取 → 可被视觉语言模型替代
-- 2.x whatsapp_auto：WhatsApp自动化 → 可被RPA/Browser-Use替代（红线：随机等待15-30s不可删，日限200条）
-- 3.5 Prompt注入：去机器味/话术 → 可被更好的Prompt工程升级
-- 3.6 Groq API：LLM调用 → 可被更便宜/更快模型替代
-- 4.4 谈判Prompt：6步谈判 → 可被强化学习/更好策略升级
-- 13.x wechat_auto：微信自动化 → 可被RPA替代（红线：不得用Hook方案）
-- 17.1 素材归集：人工分类 → 可被OCR/视觉AI替代
-- 17.2 去标识化：人工PS → 可被Inpainting/AI擦除替代
-- 17.3 视频合成：MoneyPrinter Turbo（现役）→ 可被更好视频生成工具替代
-- 17.4 文案生成：Claude人设 → 可被更好的中文生成模型升级
-- 17.5 多格式输出：手动裁剪 → 可被自动裁剪工具替代
-- 17.6 交付：人工发送 → 可被自动化分发替代
-
-### 红线（绝对不碰）
-- pHash阈值=8，不得修改
-- WhatsApp日限200条，不得突破
-- 随机等待15-30s，不得缩短
-- RXID命名规则，不得破坏
-- 微信不得用Hook/协议注入方案
-
-### 评分加成规则
-- 映射到17.x Order+Video模块：+1.0
-- 映射到去机器味/WhatsApp筛选/竞对情报：+0.5
-- 映射到核心风控步骤：-0.5
-- 需>16GB本地GPU且无云端版：-1.0
+# 兜底版本：仅当 data/Melody_Script_Map.md 在仓库中缺失时才会使用。
+# 正常情况下系统会强制要求该文件存在，避免预审退化为"精简版判断"。
+FALLBACK_SCRIPT_MAP = """
+⚠️ 警告：未找到完整版 Melody_Script_Map.md，当前为最小兜底版本，映射能力大幅受限。
+请立即检查 data/Melody_Script_Map.md 是否已上传到仓库。
 """
+
+
+def load_full_script_map() -> tuple[str, bool]:
+    """
+    强制读取【完整】Script Map 文件，不做任何截取或精简。
+    返回 (内容, 是否成功加载完整文件)
+    """
+    if os.path.exists(SCRIPT_MAP_PATH):
+        with open(SCRIPT_MAP_PATH, encoding="utf-8") as f:
+            content = f.read()
+        if len(content.strip()) > 500:  # 基本健全性检查，确保不是空文件/占位文件
+            print(f"✅ 已加载完整 Script Map（{len(content)} 字符，共 {content.count('## ')} 个章节）")
+            return content, True
+        else:
+            print(f"⚠️ {SCRIPT_MAP_PATH} 文件存在但内容过短，疑似异常文件")
+    else:
+        print(f"❌ 未找到 {SCRIPT_MAP_PATH}，使用兜底版本（映射能力严重受限）")
+    return FALLBACK_SCRIPT_MAP, False
 
 
 def load_existing_tools() -> set:
@@ -64,7 +57,6 @@ def load_existing_tools() -> set:
         with open(TOOL_DB_PATH, encoding="utf-8-sig") as f:
             reader = csv.DictReader(f)
             for row in reader:
-                # 兼容不同列名
                 name = row.get("工具名称") or row.get("tool_name") or ""
                 if name.strip():
                     tools.add(name.strip().lower())
@@ -72,24 +64,6 @@ def load_existing_tools() -> set:
     except Exception as e:
         print(f"⚠️ 读取 Video_Tool_DB 失败: {e}")
     return tools
-
-
-def read_script_map() -> str:
-    """读取Script Map文件，失败则用内嵌版本"""
-    if os.path.exists(SCRIPT_MAP_PATH):
-        with open(SCRIPT_MAP_PATH, encoding="utf-8") as f:
-            content = f.read()
-        # 只取关键部分节省token
-        lines = content.split("\n")
-        key_sections = []
-        capture = False
-        for line in lines:
-            if any(x in line for x in ["## 全局常量", "## 16.", "## 17.", "## AI 筛选宪法"]):
-                capture = True
-            if capture:
-                key_sections.append(line)
-        return "\n".join(key_sections) if key_sections else SCRIPT_MAP_INLINE
-    return SCRIPT_MAP_INLINE
 
 
 def find_latest_summary() -> str | None:
@@ -106,66 +80,83 @@ def find_latest_summary() -> str | None:
     return all_files[0] if all_files else None
 
 
-def build_system_prompt(existing_tools: set) -> str:
-    """动态构建System Prompt，注入已收录工具列表"""
-    script_map = read_script_map()
+def build_system_prompt(full_script_map: str, script_map_loaded: bool, existing_tools: set) -> str:
+    """构建 System Prompt：完整 Script Map 全文注入 + 查重列表注入"""
 
-    # 已收录工具列表（最多显示前100个，节省token）
     if existing_tools:
-        tool_list = "、".join(sorted(existing_tools)[:100])
+        tool_list = "、".join(sorted(existing_tools)[:131])
         dedup_section = f"""
-## 查重规则（最高优先级）
-以下工具已收录在 Video_Tool_DB 中，**绝对不要重复推荐**：
+## 查重规则（最高优先级，必须严格执行）
+以下 {len(existing_tools)} 个工具已收录在 Video_Tool_DB.csv 中，**绝对不要重复推荐**，
+也不要推荐这些工具的同义变体或马甲版本：
 {tool_list}
 
-如果日报中出现上述工具，直接跳过，不生成建议书。
+如果日报中出现上述工具（或明显是其更新版本/同一项目的新闻），直接跳过，不生成建议书。
 """
     else:
         dedup_section = ""
 
+    warning = "" if script_map_loaded else "\n⚠️ 重要提醒：完整 Script Map 加载失败，以下规则为兜底版本，请极度谨慎，宁可少推荐也不要乱映射。\n"
+
     return f"""你是 Melody 外贸自动化系统的「预审官」（Pre-Judge Agent）。
 
 Melody 是一个外贸 B2B 商人（五金建材：铰链/滑轨），同时运营短视频副业和翡翠出海副业。
-她的核心痛点：WhatsApp客户管理自动化、视频内容生产（Order+Video模块）、竞对情报收集。
+她的核心痛点：WhatsApp客户管理自动化、微信自动化、视频内容生产（Order+Video模块）、竞对情报收集。
 
 你会收到 Horizon AI 抓取并总结的科技资讯日报（中文）。
-你的任务是：从日报中识别对 Melody 业务有价值的**全新** AI 工具/技术，生成《候选工具建议书》。
+你的任务是：从日报中识别对 Melody 业务有价值的**全新** AI 工具/技术，并严格对照下方【完整版】
+Melody_Script_Map.md（系统唯一真理源，包含全部 18 个模块、全局常量、二创规则、AI筛选宪法）
+逐条核对，生成《候选工具建议书》。
+{warning}
 {dedup_section}
-## Melody 的业务映射规则（Script Map精简版）
-{script_map}
+## Melody_Script_Map.md（完整原文，唯一真理源 — 必须逐条对照，禁止凭空推荐）
 
-## 你的输出规则
+{full_script_map}
 
-1. **先扫描整份日报**，找出所有对 Melody 有潜在价值的工具/技术。
-2. **查重**：已在 Video_Tool_DB 中的工具直接跳过。
-3. **对每个新候选工具**，生成如下格式的建议书：
+## 你的输出规则（严格遵守 AI 筛选宪法 9 条铁律）
+
+1. **先扫描整份日报**，找出所有可能对 Melody 有价值的工具/技术。
+2. **查重**：已在 Video_Tool_DB.csv 中的工具直接跳过。
+3. **映射验证（核心步骤）**：对每个候选工具，必须在上方完整 Script Map 中找到具体的原子子步骤 ID
+   （如 1.12 / 2.6 / 3.5 / 13.5 / 17.3 等），**不允许凭空推荐**、不允许编造不存在的子步骤 ID。
+   如果在全部18个模块中都找不到对应映射，直接跳过该工具，不生成建议书。
+4. **红线检查**：核对该工具是否会触碰 Script Map 中标注的任何 ⚠️红线（如 pHash阈值8、
+   WhatsApp随机等待15-30s、200条日限、RXID命名规则、5账号并发上限、20/200条历史记录长度等）。
+   如果工具的应用会迫使红线被修改，必须在风险点中明确指出，建议降为[暂观]或[淘汰]。
+5. **评分**：基础分(0-10) + 加成/减成（严格按 Script Map 中"AI 筛选宪法"第7条：
+   映射到模块17 Order+Video → +1.0；映射到"去机器味/WhatsApp筛选/竞对情报"等高痛区 → +0.5；
+   映射到核心风控步骤 → -0.5；需>16GB本地GPU且无云端版 → -1.0）。
+6. **替换三定律检查**：如果建议替换某个现役实现，必须说明该替换满足"等价或更优"的哪一项
+   （成本↓精度≥原 / 精度↑成本≤原 / 解锁新能力且不增风险），并提醒该替换需经 Melody 人工
+   测试通过才能执行（不得擅自标记为[现役]）。
+
+7. **对每个通过验证的新候选工具**，生成如下格式的建议书：
 
 ---
 ### 🔍 工具: [工具名]
 **大白话结论**: [一句话，这工具对Melody有没有用，为什么]
 - **来源**: [日报中的来源]
 - **一句话描述**: [工具做什么]
-- **映射子步骤**: [精确到原子ID，如 17.3 / 2.x / 13.x]
+- **映射子步骤**: [必须精确到原子ID，如 17.3 / 2.6 / 13.5，并写出该子步骤的脚本名]
 - **替换对象**: [当前现役实现名，没有则填"无（新增能力）"]
 - **预期收益**: [成本/精度/速度/新能力，简短]
-- **风险点**: [封号风险/需付费/精度未知/兼容性等]
-- **Horizon评分**: X.X（基础分X.X + 加成说明）
+- **风险点**: [是否触碰红线/封号风险/需付费/精度未知/兼容性等]
+- **Horizon评分**: X.X（基础分X.X + 加成/减成明细）
 - **建议**: [通过测试] / [暂观] / [淘汰]
 
-4. 如果日报中**没有**对 Melody 有价值的新工具，直接回复：
-`📭 今日日报无匹配新工具，Melody 可跳过。`
+8. 如果日报中**没有**找到任何能映射到 Script Map 子步骤的新工具，直接回复：
+`📭 今日日报无匹配新工具（已对照全部18个模块），Melody 可跳过。`
 
-5. **全程中文**，简洁，不废话。
-6. **最多输出5个候选工具**，按评分从高到低排序。
+9. **不要输出DB_INSERT块**（那是手动操作时用的）。
+10. **全程中文**，简洁，不废话。
+11. **最多输出5个候选工具**，按评分从高到低排序。
 """
 
 
-def call_qwen(summary_text: str, existing_tools: set) -> str:
+def call_qwen(summary_text: str, system_prompt: str) -> str:
     """调用 Qwen API 进行预审分析"""
     if not DASHSCOPE_API_KEY:
         return "❌ 错误：DASHSCOPE_API_KEY 未设置"
-
-    system_prompt = build_system_prompt(existing_tools)
 
     headers = {
         "Authorization": f"Bearer {DASHSCOPE_API_KEY}",
@@ -175,14 +166,14 @@ def call_qwen(summary_text: str, existing_tools: set) -> str:
         "model": MODEL,
         "messages": [
             {"role": "system", "content": system_prompt},
-            {"role": "user", "content": f"以下是今日 Horizon 科技资讯日报，请进行预审分析：\n\n{summary_text}"},
+            {"role": "user", "content": f"以下是今日 Horizon 科技资讯日报，请按完整 Script Map 逐条核对后进行预审分析：\n\n{summary_text}"},
         ],
-        "temperature": 0.3,
-        "max_tokens": 3000,
+        "temperature": 0.2,
+        "max_tokens": 3500,
     }
 
     try:
-        with httpx.Client(timeout=120) as client:
+        with httpx.Client(timeout=180) as client:
             resp = client.post(BASE_URL, headers=headers, json=payload)
             resp.raise_for_status()
             data = resp.json()
@@ -193,7 +184,7 @@ def call_qwen(summary_text: str, existing_tools: set) -> str:
         return f"❌ 请求失败: {e}"
 
 
-def send_to_feishu(content: str, summary_file: str, tool_count: int) -> bool:
+def send_to_feishu(content: str, summary_file: str, tool_count: int, script_map_loaded: bool) -> bool:
     """推送预审结果到飞书"""
     if not FEISHU_WEBHOOK:
         print("❌ FEISHU_WEBHOOK 未设置，跳过推送")
@@ -202,11 +193,11 @@ def send_to_feishu(content: str, summary_file: str, tool_count: int) -> bool:
     date_str = datetime.date.today().strftime("%Y-%m-%d")
     title    = f"🔍 Horizon 预审官日报 {date_str}"
 
-    # 截断过长内容
-    if len(content) > 3800:
-        content = content[:3800] + "\n\n...（内容过长，已截断）"
+    if len(content) > 3700:
+        content = content[:3700] + "\n\n...（内容过长，已截断）"
 
-    header_info = f"**来源**: `{os.path.basename(summary_file)}` | **DB已收录**: {tool_count} 个工具\n\n"
+    map_status = "✅ 完整Script Map(18模块)" if script_map_loaded else "⚠️ 兜底版（请检查文件）"
+    header_info = f"**来源**: `{os.path.basename(summary_file)}` | **DB已收录**: {tool_count}个 | **映射依据**: {map_status}\n\n"
 
     payload = {
         "msg_type": "interactive",
@@ -215,7 +206,7 @@ def send_to_feishu(content: str, summary_file: str, tool_count: int) -> bool:
             "config": {"wide_screen_mode": True},
             "header": {
                 "title": {"tag": "plain_text", "content": title},
-                "template": "green",
+                "template": "green" if script_map_loaded else "orange",
             },
             "body": {
                 "elements": [
@@ -245,12 +236,15 @@ def send_to_feishu(content: str, summary_file: str, tool_count: int) -> bool:
 
 
 def main():
-    print("🔍 Horizon 预审官 v2 启动...")
+    print("🔍 Horizon 预审官 v3（完整Script Map版）启动...")
 
-    # 1. 加载已收录工具（查重用）
+    # 1. 强制加载完整 Script Map
+    full_script_map, script_map_loaded = load_full_script_map()
+
+    # 2. 加载已收录工具（查重用）
     existing_tools = load_existing_tools()
 
-    # 2. 找摘要文件
+    # 3. 找摘要文件
     summary_file = find_latest_summary()
     if not summary_file:
         print("❌ 未找到任何摘要文件，退出")
@@ -264,15 +258,18 @@ def main():
         print("⚠️ 摘要内容过短，可能是空日报，跳过预审")
         sys.exit(0)
 
-    # 3. 调用 Qwen 预审（含查重逻辑）
-    print(f"🤖 调用 {MODEL} 进行预审分析（含查重）...")
-    result = call_qwen(summary_text, existing_tools)
+    # 4. 构建 Prompt 并调用 Qwen
+    system_prompt = build_system_prompt(full_script_map, script_map_loaded, existing_tools)
+    print(f"🤖 调用 {MODEL} 进行预审分析（完整Script Map + 查重）...")
+    print(f"📏 System Prompt 长度: {len(system_prompt)} 字符")
+
+    result = call_qwen(summary_text, system_prompt)
     print("─" * 60)
     print(result)
     print("─" * 60)
 
-    # 4. 推送飞书
-    send_to_feishu(result, summary_file, len(existing_tools))
+    # 5. 推送飞书
+    send_to_feishu(result, summary_file, len(existing_tools), script_map_loaded)
 
     print("✅ 预审官完成")
 
