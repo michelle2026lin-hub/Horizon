@@ -12,8 +12,8 @@
   "sources": {
     "hackernews": {
       "enabled": true,
-      "fetch_top_stories": 5,
-      "min_score": 50
+      "fetch_top_stories": 10,
+      "min_score": 100
     },
     "github": [
       {
@@ -37,6 +37,21 @@
         "name": "ProductHunt",
         "url": "https://www.producthunt.com/feed",
         "enabled": true
+      },
+      {
+        "name": "HuggingFace Papers",
+        "url": "https://huggingface.co/papers/rss",
+        "enabled": true
+      },
+      {
+        "name": "OpenAI Blog",
+        "url": "https://openai.com/blog/rss.xml",
+        "enabled": true
+      },
+      {
+        "name": "Anthropic News",
+        "url": "https://www.anthropic.com/news/rss.xml",
+        "enabled": true
       }
     ],
     "reddit": {
@@ -53,7 +68,7 @@
   },
   "filtering": {
     "ai_score_threshold": 6.0,
-    "time_window_hours": 6
+    "time_window_hours": 24
   },
   "enrichment": {
     "enabled": false
