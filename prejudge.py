@@ -19,7 +19,7 @@ import httpx
 # ── 飞书 ──────────────────────────────────────────────────────────────────────
 FEISHU_WEBHOOK  = os.environ.get("FEISHU_WEBHOOK", "")
 SUMMARY_DIR     = "data/summaries"
-SCRIPT_MAP_PATH = "data/Melody_Script_Map.md"
+SCRIPT_MAP_PATH = "data/Melody_Script_Map_v4.0.md"
 TOOL_DB_PATH    = "data/Video_Tool_DB.csv"
 
 # ── 第一层：阿里云百炼模型池（按到期日从早到晚排序，优先消耗快过期的）─────────────
